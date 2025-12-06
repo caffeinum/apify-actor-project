@@ -3,7 +3,7 @@
   "name": "apify-actor-project",
   "title": "Fun Text Transformer 🎨",
   "description": "Transform your text in fun ways! Supports reverse, leetspeak, pirate talk, uwu, emojify, and more. Built with TypeScript and Bun, supports Standby mode for instant API responses.",
-  "version": "1.0.0",
+  "version": "1.0",
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
   "input": "./input_schema.json",
