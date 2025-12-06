@@ -10,7 +10,7 @@ RUN apk add --no-cache bash curl unzip && \
 COPY . ./
 
 # Install dependencies using Bun
-RUN bun install --production
+RUN bun install --production --no-save
 
 # Run the actor
 CMD bun run src/main.ts
