@@ -6,11 +6,14 @@ RUN apk add --no-cache bash curl unzip && \
     curl -fsSL https://bun.sh/install | bash && \
     ln -s /root/.bun/bin/bun /usr/local/bin/bun
 
-# Copy all files
+# Copy package files first
+COPY package.json ./
+
+# Install dependencies using npm (more reliable in Docker)
+RUN npm install --omit=dev
+
+# Copy the rest of the application
 COPY . ./
 
-# Install dependencies using Bun
-RUN bun install --production --no-frozen-lockfile
-
-# Run the actor
+# Run the actor with Bun
 CMD bun run src/main.ts
