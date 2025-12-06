@@ -1,8 +1,28 @@
 import http from 'http';
 import { Actor } from 'apify';
+import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
 
-// Fun text transformation functions
-const transformations = {
+// setup openrouter via openai-compatible api
+const openrouter = createOpenAI({
+    baseURL: 'https://openrouter.apify.actor/api/v1',
+    apiKey: 'apify', // any non-empty string works
+    headers: {
+        Authorization: `Bearer ${process.env.APIFY_TOKEN}`,
+    },
+});
+
+// helper to call ai
+async function askAI(prompt: string): Promise<string> {
+    const { text } = await generateText({
+        model: openrouter('openrouter/auto'),
+        prompt,
+    });
+    return text;
+}
+
+// fun text transformation functions (sync)
+const transformations: Record<string, (text: string) => string> = {
     reverse: (text: string) => text.split('').reverse().join(''),
 
     uppercase: (text: string) => text.toUpperCase(),
@@ -50,6 +70,15 @@ const transformations = {
         .replace(/ove/g, 'uv')
         + ' uwu',
 };
+
+// apply transformation (handles ai async case)
+async function applyTransform(transform: string, message: string): Promise<string> {
+    if (transform === 'ai') {
+        return await askAI(message);
+    }
+    const transformFn = transformations[transform];
+    return transformFn ? transformFn(message) : message;
+}
 
 // Initialize the Apify Actor
 await Actor.init();
@@ -108,16 +137,15 @@ if (Actor.config.get('metaOrigin') === 'STANDBY') {
             const message = input.message || 'Hello from Fun Text Transformer!';
             const transform = input.transform || 'emojify';
 
-            // Apply transformation
-            const transformFn = transformations[transform as keyof typeof transformations];
-            const transformed = transformFn ? transformFn(message) : message;
+            // Apply transformation (async for ai)
+            const transformed = await applyTransform(transform, message);
 
             // Process the request
             const result = {
                 original: message,
                 transformed: transformed,
                 transformation: transform,
-                availableTransforms: Object.keys(transformations),
+                availableTransforms: [...Object.keys(transformations), 'ai'],
                 timestamp: new Date().toISOString(),
                 status: 'success',
                 processedBy: 'Fun Text Transformer 🎨',
@@ -164,16 +192,15 @@ if (Actor.config.get('metaOrigin') === 'STANDBY') {
         console.log('Input message:', message);
         console.log('Transformation:', transform);
 
-        // Apply transformation
-        const transformFn = transformations[transform as keyof typeof transformations];
-        const transformed = transformFn ? transformFn(message) : message;
+        // Apply transformation (async for ai)
+        const transformed = await applyTransform(transform, message);
 
         // Create result
         const result = {
             original: message,
             transformed: transformed,
             transformation: transform,
-            availableTransforms: Object.keys(transformations),
+            availableTransforms: [...Object.keys(transformations), 'ai'],
             timestamp: new Date().toISOString(),
             status: 'success',
             processedBy: 'Fun Text Transformer 🎨 (Standard Mode)',
