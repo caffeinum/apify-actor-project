@@ -16,7 +16,7 @@
       "description": "Choose how to transform your text",
       "editor": "select",
       "default": "emojify",
-      "enum": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu"],
+      "enum": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu", "ai"],
       "enumTitles": [
         "Reverse 🔄",
         "UPPERCASE 📢",
@@ -25,7 +25,8 @@
         "SpOnGeBoB 🧽",
         "Emojify 😊",
         "Pirate Talk ☠️",
-        "UwU Speak 🐱"
+        "UwU Speak 🐱",
+        "AI 🤖"
       ]
     }
   },
