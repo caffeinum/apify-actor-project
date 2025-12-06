@@ -4,7 +4,8 @@ Transform your text in fun and creative ways! A playful Apify Actor built with T
 
 ## Features
 
-- 🎭 **8 Fun Transformations**: reverse, uppercase, lowercase, leetspeak, spongebob, emojify, pirate, and uwu
+- 🎭 **9 Fun Transformations**: reverse, uppercase, lowercase, leetspeak, spongebob, emojify, pirate, uwu, and **ai**
+- 🤖 **AI-powered transformation** using OpenRouter via Apify's proxy
 - 🚀 Built with TypeScript and Bun for fast performance
 - ⚡ **Standby Mode** support for instant API-like responses
 - 🔄 Dual mode: Works as both traditional Actor and HTTP server
@@ -22,6 +23,7 @@ Transform your text in fun and creative ways! A playful Apify Actor built with T
 - **Emojify** 😊: Adds emojis to words like happy, love, fire, cool, etc.
 - **Pirate Talk** ☠️: Ahoy matey! Transforms ye text to pirate speak
 - **UwU Speak** 🐱: Twansfowms youw text to cute uwu speak uwu
+- **AI** 🤖: Send your message to an AI model via OpenRouter
 
 ## Actor Modes
 
@@ -83,7 +85,7 @@ When running in standard mode (via Apify Console or API), the actor accepts the 
   "original": "This is a cool and happy message!",
   "transformed": "This is a cool 😎 and happy 😊 message!",
   "transformation": "emojify",
-  "availableTransforms": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu"],
+  "availableTransforms": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu", "ai"],
   "timestamp": "2024-12-06T19:00:00.000Z",
   "status": "success",
   "processedBy": "Fun Text Transformer 🎨 (Standard Mode)"
@@ -115,13 +117,24 @@ curl -X POST https://YOUR-STANDBY-URL/ \
   -d '{"message": "This is amazing!", "transform": "spongebob"}'
 ```
 
+**AI Transformation:**
+```bash
+# Ask AI a question
+curl "https://YOUR-STANDBY-URL/?message=What+is+the+meaning+of+life&transform=ai"
+
+# Or via POST
+curl -X POST https://YOUR-STANDBY-URL/ \
+  -H "Content-Type: application/json" \
+  -d '{"message": "Write a haiku about coding", "transform": "ai"}'
+```
+
 **Response Format:**
 ```json
 {
   "original": "Hello my friend",
   "transformed": "Ahoy me matey ☠️",
   "transformation": "pirate",
-  "availableTransforms": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu"],
+  "availableTransforms": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu", "ai"],
   "timestamp": "2024-12-06T19:00:00.000Z",
   "status": "success",
   "processedBy": "Fun Text Transformer 🎨",
@@ -154,6 +167,28 @@ The Actor automatically detects which mode it's running in using the `APIFY_META
 - Other values: Runs in standard mode
 
 The HTTP server listens on the port specified by `Actor.config.get('standbyPort')` (or `ACTOR_STANDBY_PORT` environment variable).
+
+## AI Integration
+
+The `ai` transformation uses the [Vercel AI SDK](https://sdk.vercel.ai/) with OpenRouter via Apify's proxy. It automatically uses your `APIFY_TOKEN` for authentication.
+
+```typescript
+import { generateText } from 'ai';
+import { createOpenAI } from '@ai-sdk/openai';
+
+const openrouter = createOpenAI({
+    baseURL: 'https://openrouter.apify.actor/api/v1',
+    apiKey: 'apify', // any non-empty string works
+    headers: {
+        Authorization: `Bearer ${process.env.APIFY_TOKEN}`,
+    },
+});
+
+const { text } = await generateText({
+    model: openrouter('openrouter/auto'),
+    prompt: 'your prompt here',
+});
+```
 
 ## Monetization
 
