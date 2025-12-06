@@ -1,0 +1,33 @@
+{
+  "actorSpecification": 1,
+  "name": "apify-actor-project",
+  "title": "Apify Actor with Bun",
+  "description": "A simple Apify Actor built with TypeScript and Bun",
+  "version": "1.0.0",
+  "dockerfile": "./Dockerfile",
+  "readme": "./README.md",
+  "input": "./input_schema.json",
+  "storages": {
+    "dataset": {
+      "actorSpecification": 1,
+      "title": "Crawl Results",
+      "views": {
+        "overview": {
+          "title": "Overview",
+          "transformation": {
+            "fields": [
+              "url",
+              "title",
+              "linkCount",
+              "timestamp"
+            ]
+          },
+          "display": {
+            "component": "table",
+            "properties": {}
+          }
+        }
+      }
+    }
+  }
+}

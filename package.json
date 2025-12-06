@@ -1,0 +1,22 @@
+{
+  "name": "apify-actor-project",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Apify Actor built with TypeScript and Bun",
+  "main": "dist/main.js",
+  "scripts": {
+    "start": "bun run dist/main.js",
+    "build": "bun build src/main.ts --outdir dist --target node",
+    "test": "bun test",
+    "dev": "bun run src/main.ts"
+  },
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "apify": "^3.0.0"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0"
+  }
+}

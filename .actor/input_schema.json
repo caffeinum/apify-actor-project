@@ -1,0 +1,14 @@
+{
+  "title": "Apify Actor Input",
+  "type": "object",
+  "schemaVersion": 1,
+  "properties": {
+    "message": {
+      "title": "Message",
+      "type": "string",
+      "description": "A message to process",
+      "editor": "textfield",
+      "default": "Hello from Apify Actor!"
+    }
+  }
+}
