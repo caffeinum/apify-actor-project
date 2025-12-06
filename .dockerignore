@@ -1,0 +1,12 @@
+node_modules
+.git
+.gitignore
+README.md
+tests
+.vscode
+.idea
+*.log
+apify_storage
+storage
+.env
+.env.local
