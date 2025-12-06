@@ -1,14 +1,33 @@
 {
-  "title": "Apify Actor Input",
+  "title": "Fun Text Transformer Input",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
     "message": {
       "title": "Message",
       "type": "string",
-      "description": "A message to process",
+      "description": "The text you want to transform",
       "editor": "textfield",
-      "default": "Hello from Apify Actor!"
+      "default": "This is a cool and happy message!"
+    },
+    "transform": {
+      "title": "Transformation Type",
+      "type": "string",
+      "description": "Choose how to transform your text",
+      "editor": "select",
+      "default": "emojify",
+      "enum": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu"],
+      "enumTitles": [
+        "Reverse 🔄",
+        "UPPERCASE 📢",
+        "lowercase 🔽",
+        "L33T SP34K 💻",
+        "SpOnGeBoB 🧽",
+        "Emojify 😊",
+        "Pirate Talk ☠️",
+        "UwU Speak 🐱"
+      ]
     }
-  }
+  },
+  "required": ["message"]
 }

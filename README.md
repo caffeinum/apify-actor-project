@@ -1,15 +1,27 @@
-# Apify Actor Project
+# Fun Text Transformer 🎨
 
-A simple Apify Actor built with TypeScript and Bun, supporting both **Standard** and **Standby** modes.
+Transform your text in fun and creative ways! A playful Apify Actor built with TypeScript and Bun, supporting both **Standard** and **Standby** modes.
 
 ## Features
 
+- 🎭 **8 Fun Transformations**: reverse, uppercase, lowercase, leetspeak, spongebob, emojify, pirate, and uwu
 - 🚀 Built with TypeScript and Bun for fast performance
 - ⚡ **Standby Mode** support for instant API-like responses
 - 🔄 Dual mode: Works as both traditional Actor and HTTP server
 - 📊 Saves results to Apify dataset
 - 🧪 Includes test suite
 - 🛠️ Ready for deployment to Apify platform
+
+## Available Transformations
+
+- **Reverse** 🔄: Reverses your text backwards
+- **UPPERCASE** 📢: MAKES EVERYTHING LOUD
+- **lowercase** 🔽: makes everything quiet
+- **L33T SP34K** 💻: 7r4n5f0rm5 70 l337 5p34k
+- **SpOnGeBoB** 🧽: aLtErNaTiNg CaPs LiKe ThE mEmE
+- **Emojify** 😊: Adds emojis to words like happy, love, fire, cool, etc.
+- **Pirate Talk** ☠️: Ahoy matey! Transforms ye text to pirate speak
+- **UwU Speak** 🐱: Twansfowms youw text to cute uwu speak uwu
 
 ## Actor Modes
 
@@ -60,17 +72,21 @@ When running in standard mode (via Apify Console or API), the actor accepts the 
 
 ```json
 {
-  "message": "Your custom message here"
+  "message": "This is a cool and happy message!",
+  "transform": "emojify"
 }
 ```
 
 **Output:**
 ```json
 {
-  "message": "Your custom message here",
+  "original": "This is a cool and happy message!",
+  "transformed": "This is a cool 😎 and happy 😊 message!",
+  "transformation": "emojify",
+  "availableTransforms": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu"],
   "timestamp": "2024-12-06T19:00:00.000Z",
   "status": "success",
-  "processedBy": "Apify Actor with Bun (Standard Mode)"
+  "processedBy": "Fun Text Transformer 🎨 (Standard Mode)"
 }
 ```
 
@@ -82,32 +98,35 @@ When running in Standby mode, the Actor exposes an HTTP API that can be called d
 
 **GET Request with Query Parameters:**
 ```bash
-curl "https://YOUR-STANDBY-URL/?message=Hello+World"
+# Pirate transformation
+curl "https://YOUR-STANDBY-URL/?message=Hello+my+friend&transform=pirate"
+
+# Leetspeak transformation
+curl "https://YOUR-STANDBY-URL/?message=Hello+there&transform=leetspeak"
+
+# UwU transformation
+curl "https://YOUR-STANDBY-URL/?message=I+love+coding&transform=uwu"
 ```
 
 **POST Request with JSON Body:**
 ```bash
 curl -X POST https://YOUR-STANDBY-URL/ \
   -H "Content-Type: application/json" \
-  -d '{"message": "Hello from Standby!"}'
-```
-
-**POST Request with Plain Text:**
-```bash
-curl -X POST https://YOUR-STANDBY-URL/ \
-  -H "Content-Type: text/plain" \
-  -d "Your message here"
+  -d '{"message": "This is amazing!", "transform": "spongebob"}'
 ```
 
 **Response Format:**
 ```json
 {
-  "message": "Your message here",
+  "original": "Hello my friend",
+  "transformed": "Ahoy me matey ☠️",
+  "transformation": "pirate",
+  "availableTransforms": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu"],
   "timestamp": "2024-12-06T19:00:00.000Z",
   "status": "success",
-  "processedBy": "Apify Actor with Bun (Standby Mode)",
-  "method": "POST",
-  "url": "/"
+  "processedBy": "Fun Text Transformer 🎨",
+  "method": "GET",
+  "url": "/?message=Hello+my+friend&transform=pirate"
 }
 ```
 

@@ -1,6 +1,56 @@
 import http from 'http';
 import { Actor } from 'apify';
 
+// Fun text transformation functions
+const transformations = {
+    reverse: (text: string) => text.split('').reverse().join(''),
+
+    uppercase: (text: string) => text.toUpperCase(),
+
+    lowercase: (text: string) => text.toLowerCase(),
+
+    leetspeak: (text: string) => text
+        .replace(/[aA]/g, '4')
+        .replace(/[eE]/g, '3')
+        .replace(/[iI]/g, '1')
+        .replace(/[oO]/g, '0')
+        .replace(/[sS]/g, '5')
+        .replace(/[tT]/g, '7'),
+
+    spongebob: (text: string) => text.split('').map((char, i) =>
+        i % 2 === 0 ? char.toLowerCase() : char.toUpperCase()
+    ).join(''),
+
+    emojify: (text: string) => {
+        const emojiMap: Record<string, string> = {
+            'happy': '😊', 'sad': '😢', 'love': '❤️', 'fire': '🔥',
+            'cool': '😎', 'laugh': '😂', 'think': '🤔', 'wow': '😮',
+            'rocket': '🚀', 'star': '⭐', 'heart': '💖', 'party': '🎉'
+        };
+        let result = text;
+        for (const [word, emoji] of Object.entries(emojiMap)) {
+            result = result.replace(new RegExp(word, 'gi'), `${word} ${emoji}`);
+        }
+        return result;
+    },
+
+    pirate: (text: string) => text
+        .replace(/\byou\b/gi, 'ye')
+        .replace(/\bmy\b/gi, 'me')
+        .replace(/\bis\b/gi, 'be')
+        .replace(/\bthe\b/gi, 'th\'')
+        .replace(/\bhello\b/gi, 'ahoy')
+        .replace(/\bfriend\b/gi, 'matey') + ' ☠️',
+
+    uwu: (text: string) => text
+        .replace(/[rl]/g, 'w')
+        .replace(/[RL]/g, 'W')
+        .replace(/n([aeiou])/g, 'ny$1')
+        .replace(/N([aeiou])/g, 'Ny$1')
+        .replace(/ove/g, 'uv')
+        + ' uwu',
+};
+
 // Initialize the Apify Actor
 await Actor.init();
 
@@ -37,7 +87,7 @@ if (Actor.config.get('metaOrigin') === 'STANDBY') {
             }
 
             // Parse input from body or use query parameters
-            let input: { message?: string } = {};
+            let input: { message?: string; transform?: string } = {};
             if (body) {
                 try {
                     input = JSON.parse(body);
@@ -49,19 +99,28 @@ if (Actor.config.get('metaOrigin') === 'STANDBY') {
                 // Parse query parameters
                 const url = new URL(req.url, `http://localhost:${port}`);
                 const message = url.searchParams.get('message');
+                const transform = url.searchParams.get('transform');
                 if (message) {
-                    input = { message };
+                    input = { message, transform: transform || undefined };
                 }
             }
 
-            const message = input.message || 'Hello from Apify Actor Standby!';
+            const message = input.message || 'Hello from Fun Text Transformer!';
+            const transform = input.transform || 'emojify';
+
+            // Apply transformation
+            const transformFn = transformations[transform as keyof typeof transformations];
+            const transformed = transformFn ? transformFn(message) : message;
 
             // Process the request
             const result = {
-                message: message,
+                original: message,
+                transformed: transformed,
+                transformation: transform,
+                availableTransforms: Object.keys(transformations),
                 timestamp: new Date().toISOString(),
                 status: 'success',
-                processedBy: 'Apify Actor with Bun (Standby Mode)',
+                processedBy: 'Fun Text Transformer 🎨',
                 method: req.method,
                 url: req.url,
             };
@@ -97,18 +156,27 @@ if (Actor.config.get('metaOrigin') === 'STANDBY') {
 
     try {
         // Get input from Apify platform (or use default)
-        const input = (await Actor.getInput()) as { message?: string } || {};
-        const message = input.message || 'Hello from Apify Actor!';
+        const input = (await Actor.getInput()) as { message?: string; transform?: string } || {};
+        const message = input.message || 'Hello from Fun Text Transformer!';
+        const transform = input.transform || 'emojify';
 
         console.log('Actor started!');
         console.log('Input message:', message);
+        console.log('Transformation:', transform);
 
-        // Simulate some work
+        // Apply transformation
+        const transformFn = transformations[transform as keyof typeof transformations];
+        const transformed = transformFn ? transformFn(message) : message;
+
+        // Create result
         const result = {
-            message: message,
+            original: message,
+            transformed: transformed,
+            transformation: transform,
+            availableTransforms: Object.keys(transformations),
             timestamp: new Date().toISOString(),
             status: 'success',
-            processedBy: 'Apify Actor with Bun (Standard Mode)',
+            processedBy: 'Fun Text Transformer 🎨 (Standard Mode)',
         };
 
         // Save the results to the Actor's dataset
