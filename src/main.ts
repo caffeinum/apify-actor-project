@@ -27,6 +27,14 @@ Key requirements when modifying:
 - Use "await Actor.getInput()" to get input
 - Use "await Actor.pushData()" to save results
 - Handle errors gracefully with try/catch
+- In package.json, use these exact versions:
+  - "apify": "^3.0.0" (NOT ^4.0.0)
+  - "@types/node": "^20.0.0"
+  - "typescript": "^5.0.0"
+- In .actor/actor.json, paths are relative to .actor folder:
+  - "input": "./input_schema.json" (NOT "./.actor/input_schema.json")
+  - "dockerfile": "../Dockerfile"
+  - "readme": "../README.md"
 
 After modifying all files, the actor will be tested and published automatically.
 Do NOT run apify push or apify run yourself - it will be done after you finish.
@@ -210,7 +218,7 @@ Make sure the actor is complete and ready to deploy.`;
         logs.push('publishing actor to apify...');
         console.log('publishing actor...');
         
-        const pushResult = execSync('bun x apify-cli push 2>&1', {
+        const pushResult = execSync('bun x apify-cli push --force 2>&1', {
             cwd: workDir,
             env: {
                 ...process.env,
