@@ -17,6 +17,13 @@
       "editor": "textfield",
       "prefill": "my-new-actor",
       "pattern": "^[a-z0-9-]+$"
+    },
+    "claudeOauthToken": {
+      "title": "Claude OAuth Token",
+      "type": "string",
+      "description": "Your Claude Code OAuth token. Can also be set as CLAUDE_CODE_OAUTH_TOKEN environment variable.",
+      "editor": "textfield",
+      "isSecret": true
     }
   },
   "required": ["prompt", "actorName"]

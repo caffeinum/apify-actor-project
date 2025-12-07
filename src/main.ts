@@ -35,6 +35,7 @@ Focus on creating clean, working code that follows Apify best practices.`;
 interface ActorBuilderInput {
     prompt: string;
     actorName: string;
+    claudeOauthToken?: string;
 }
 
 async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean; actorName: string; logs: string[] }> {
