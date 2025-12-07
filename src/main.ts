@@ -39,7 +39,7 @@ interface ActorBuilderInput {
 }
 
 async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean; actorName: string; logs: string[] }> {
-    const { prompt, actorName } = input;
+    const { prompt, actorName, claudeOauthToken } = input;
     const logs: string[] = [];
     
     // create a temp directory for the new actor
@@ -59,10 +59,14 @@ async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean;
     logs.push(`created working directory: ${workDir}`);
     console.log(`working directory: ${workDir}`);
 
-    const claudeToken = process.env.CLAUDE_CODE_OAUTH_TOKEN;
+    // get claude token from input or env var
+    const claudeToken = claudeOauthToken || process.env.CLAUDE_CODE_OAUTH_TOKEN;
     if (!claudeToken) {
-        throw new Error('CLAUDE_CODE_OAUTH_TOKEN environment variable is required');
+        throw new Error('claudeOauthToken input or CLAUDE_CODE_OAUTH_TOKEN environment variable is required');
     }
+    
+    // set the token in env for the claude agent sdk
+    process.env.CLAUDE_CODE_OAUTH_TOKEN = claudeToken;
 
     const apifyToken = process.env.APIFY_TOKEN;
     if (!apifyToken) {
