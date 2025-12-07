@@ -8,7 +8,7 @@ import * as path from 'path';
 const SYSTEM_PROMPT = `You are an expert Apify Actor builder. Your job is to create complete, production-ready Apify Actors based on user requirements.
 
 IMPORTANT WORKFLOW:
-1. First, run: bunx apify create ACTOR_NAME -t ts-start-bun --skip-dependency-install
+1. First, run: bun x apify-cli create ACTOR_NAME -t ts-start-bun --skip-dependency-install
    This scaffolds a complete TypeScript + Bun actor with all required files.
 2. Then modify the generated files to implement the user's requirements.
 
@@ -73,7 +73,7 @@ async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean;
 ${prompt}
 
 Steps:
-1. First run: bunx apify create ${actorName} -t ts-start-bun --skip-dependency-install
+1. First run: bun x apify-cli create ${actorName} -t ts-start-bun --skip-dependency-install
 2. Then cd into the created directory and modify the files to implement the requirements
 3. Update src/main.ts with the actor logic
 4. Update .actor/actor.json with proper title and description
@@ -173,7 +173,7 @@ Make sure the actor is complete and ready to deploy.`;
         logs.push('publishing actor to apify...');
         console.log('publishing actor...');
         
-        const pushResult = execSync('bunx apify push', {
+        const pushResult = execSync('bun x apify-cli push', {
             cwd: workDir,
             env: {
                 ...process.env,
