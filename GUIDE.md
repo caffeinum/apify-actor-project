@@ -228,7 +228,39 @@ git push -u origin main
 
 ## Step 6: Deploy to Apify
 
-### First Time Deployment
+### Option A: Using the Publish Script (Recommended)
+
+This project includes a publish script that uses the Apify SDK to upload source files directly:
+
+```bash
+# Set your Apify API token
+export APIFY_TOKEN=your_token_here
+
+# Publish current directory
+bun run publish:actor .
+
+# Or publish a specific directory
+bun run publish:actor ./my-actor
+
+# With options
+bun run scripts/publish.ts ./my-actor --name my-cool-actor --version 1.0 --public
+```
+
+The script will:
+1. Collect all source files from the directory
+2. Read actor config from `.actor/actor.json`
+3. Create or update the actor on Apify
+4. Trigger a build and wait for completion
+
+**Available options:**
+- `--name` - Actor name (default: from actor.json or directory name)
+- `--version` - Version number (default: from actor.json or "0.1")
+- `--tag` - Build tag (default: "latest")
+- `--public` - Make actor public
+- `--token` - Apify API token (default: APIFY_TOKEN env var)
+
+### Option B: Using Apify CLI
+
 ```bash
 apify push
 ```
@@ -244,7 +276,10 @@ This will:
 git add .
 git commit -m "Update actor"
 
-# Push to Apify
+# Push to Apify (using script)
+bun run publish:actor .
+
+# Or using CLI
 apify push
 ```
 
@@ -380,6 +415,11 @@ curl "https://YOUR-STANDBY-URL/?param=value"
 ## Quick Reference Commands
 
 ```bash
+# Publish script (recommended)
+bun run publish:actor .                    # Publish current directory
+bun run publish:actor ./my-actor           # Publish specific directory
+bun run publish:actor . --version 1.0      # Publish with version
+
 # CLI commands
 apify login              # Authenticate
 apify push              # Deploy actor
