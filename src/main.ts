@@ -41,7 +41,15 @@ interface ActorBuilderInput {
     claudeOauthToken?: string;
 }
 
-async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean; actorName: string; logs: string[] }> {
+interface BuildResult {
+    success: boolean;
+    actorName: string;
+    logs: string[];
+    actorUrl?: string;
+    files?: Record<string, string>;
+}
+
+async function buildActor(input: ActorBuilderInput): Promise<BuildResult> {
     const { prompt, actorName, claudeOauthToken } = input;
     const logs: string[] = [];
     
@@ -202,22 +210,51 @@ Make sure the actor is complete and ready to deploy.`;
         logs.push('publishing actor to apify...');
         console.log('publishing actor...');
         
-        const pushResult = execSync('bun x apify-cli push', {
+        const pushResult = execSync('bun x apify-cli push 2>&1', {
             cwd: workDir,
             env: {
                 ...process.env,
                 APIFY_TOKEN: apifyToken,
             },
             encoding: 'utf-8',
-            stdio: 'pipe',
         });
 
         logs.push(`push result: ${pushResult}`);
         console.log('push result:', pushResult);
 
+        // extract actor URL from push output
+        const actorUrlMatch = pushResult.match(/Actor detail (https:\/\/console\.apify\.com[^\s]+)/);
+        const actorUrl = actorUrlMatch ? actorUrlMatch[1] : undefined;
+        
+        if (actorUrl) {
+            logs.push(`actor URL: ${actorUrl}`);
+            console.log('actor URL:', actorUrl);
+        }
+
+        // collect all source files to save to storage
+        const files: Record<string, string> = {};
+        const filesToSave = [
+            'src/main.ts',
+            '.actor/actor.json',
+            '.actor/input_schema.json',
+            'package.json',
+            'Dockerfile',
+            'tsconfig.json',
+            'README.md',
+        ];
+        
+        for (const file of filesToSave) {
+            const filePath = path.join(workDir, file);
+            if (fs.existsSync(filePath)) {
+                files[file] = fs.readFileSync(filePath, 'utf-8');
+            }
+        }
+
         return {
             success: true,
             actorName,
+            actorUrl,
+            files,
             logs,
         };
 
@@ -251,14 +288,29 @@ try {
 
     const result = await buildActor(input);
 
+    // save result to dataset (without large files object for cleaner output)
+    const { files, ...resultWithoutFiles } = result;
     await Actor.pushData({
-        ...result,
+        ...resultWithoutFiles,
         timestamp: new Date().toISOString(),
         inputPrompt: input.prompt,
     });
 
+    // save actor source files to key-value store
+    if (result.files) {
+        await Actor.setValue('OUTPUT', {
+            actorName: result.actorName,
+            actorUrl: result.actorUrl,
+            files: result.files,
+        });
+        console.log('saved actor source files to OUTPUT key-value store');
+    }
+
     if (result.success) {
         console.log(`actor "${input.actorName}" built and published successfully!`);
+        if (result.actorUrl) {
+            console.log(`view actor: ${result.actorUrl}`);
+        }
     } else {
         console.log(`failed to build actor "${input.actorName}"`);
     }
