@@ -7,27 +7,28 @@ import * as path from 'path';
 // system prompt for the actor builder agent
 const SYSTEM_PROMPT = `You are an expert Apify Actor builder. Your job is to create complete, production-ready Apify Actors based on user requirements.
 
-IMPORTANT: Read the GUIDE.md file in your working directory first! It contains the complete guide for building Apify Actors with Bun, including all file structures, configurations, and best practices.
+IMPORTANT WORKFLOW:
+1. First, run: bunx apify create ACTOR_NAME -t ts-start-bun --skip-dependency-install
+   This scaffolds a complete TypeScript + Bun actor with all required files.
+2. Then modify the generated files to implement the user's requirements.
 
-When building an actor, you must create these files in the working directory:
-1. src/main.ts - The main actor code using the Apify SDK
-2. .actor/actor.json - Actor metadata and configuration (IMPORTANT: version must be "MAJOR.MINOR" format like "1.0", NOT "1.0.0")
-3. .actor/input_schema.json - Input schema definition
-4. package.json - Dependencies (always include "apify": "^3.0.0")
-5. Dockerfile - Use the bun base image (FROM oven/bun:1)
-6. tsconfig.json - TypeScript configuration
-7. README.md - Documentation
+The scaffolded actor will have:
+- src/main.ts - Main actor code (modify this to implement the logic)
+- .actor/actor.json - Actor metadata (update title, description)
+- .actor/input_schema.json - Input schema (customize for your needs)
+- package.json - Dependencies
+- Dockerfile - Already configured for Bun
+- tsconfig.json - TypeScript config
+- README.md - Documentation (update with usage info)
 
-Key requirements:
-- Use TypeScript and Bun runtime
+Key requirements when modifying:
+- Keep the version in actor.json as "MAJOR.MINOR" format (e.g., "0.0", "1.0"), NOT semver
 - Always use "await Actor.init()" at the start and "await Actor.exit()" at the end
 - Use "await Actor.getInput()" to get input
 - Use "await Actor.pushData()" to save results
 - Handle errors gracefully with try/catch
-- The Dockerfile must use FROM oven/bun:1 as base image
-- Include proper build scripts in package.json
 
-After creating all files, the actor will be published automatically.
+After modifying all files, the actor will be published automatically.
 Do NOT run apify push yourself - it will be done after you finish.
 
 Focus on creating clean, working code that follows Apify best practices.`;
@@ -42,22 +43,15 @@ async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean;
     const { prompt, actorName, claudeOauthToken } = input;
     const logs: string[] = [];
     
-    // create a temp directory for the new actor
-    const workDir = `/tmp/${actorName}-${Date.now()}`;
-    fs.mkdirSync(workDir, { recursive: true });
-    fs.mkdirSync(path.join(workDir, 'src'), { recursive: true });
-    fs.mkdirSync(path.join(workDir, '.actor'), { recursive: true });
+    // create a temp directory to work in
+    const baseDir = `/tmp/actor-builder-${Date.now()}`;
+    fs.mkdirSync(baseDir, { recursive: true });
     
-    // copy GUIDE.md to the working directory so the agent can read it
-    const guideSource = path.join(process.cwd(), 'GUIDE.md');
-    const guideDest = path.join(workDir, 'GUIDE.md');
-    if (fs.existsSync(guideSource)) {
-        fs.copyFileSync(guideSource, guideDest);
-        logs.push('copied GUIDE.md to working directory');
-    }
+    // the actor will be created inside this directory by apify create
+    const workDir = path.join(baseDir, actorName);
     
-    logs.push(`created working directory: ${workDir}`);
-    console.log(`working directory: ${workDir}`);
+    logs.push(`base directory: ${baseDir}`);
+    console.log(`base directory: ${baseDir}`);
 
     // get claude token from input or env var
     const claudeToken = claudeOauthToken || process.env.CLAUDE_CODE_OAUTH_TOKEN;
@@ -78,9 +72,14 @@ async function buildActor(input: ActorBuilderInput): Promise<{ success: boolean;
 
 ${prompt}
 
-Create all necessary files (src/main.ts, .actor/actor.json, .actor/input_schema.json, package.json, Dockerfile, tsconfig.json, README.md).
+Steps:
+1. First run: bunx apify create ${actorName} -t ts-start-bun --skip-dependency-install
+2. Then cd into the created directory and modify the files to implement the requirements
+3. Update src/main.ts with the actor logic
+4. Update .actor/actor.json with proper title and description
+5. Update .actor/input_schema.json with the required inputs
+6. Update README.md with usage documentation
 
-Refer to GUIDE.md.
 Make sure the actor is complete and ready to deploy.`;
 
     logs.push(`starting claude agent with prompt: ${fullPrompt.substring(0, 100)}...`);
@@ -94,7 +93,7 @@ Make sure the actor is complete and ready to deploy.`;
         const response = query({
             prompt: fullPrompt,
             options: {
-                cwd: workDir,
+                cwd: baseDir,
                 systemPrompt: SYSTEM_PROMPT,
                 permissionMode: 'acceptEdits',
                 executable: 'bun',
