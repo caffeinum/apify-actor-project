@@ -75,6 +75,7 @@ ${prompt}
 
 Create all necessary files (src/main.ts, .actor/actor.json, .actor/input_schema.json, package.json, Dockerfile, tsconfig.json, README.md).
 
+Refer to GUIDE.md.
 Make sure the actor is complete and ready to deploy.`;
 
     logs.push(`starting claude agent with prompt: ${fullPrompt.substring(0, 100)}...`);
@@ -88,7 +89,6 @@ Make sure the actor is complete and ready to deploy.`;
         const response = query({
             prompt: fullPrompt,
             options: {
-                model: 'claude-sonnet-4-20250514',
                 cwd: workDir,
                 systemPrompt: SYSTEM_PROMPT,
                 permissionMode: 'acceptEdits',
