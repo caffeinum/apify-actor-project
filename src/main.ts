@@ -28,8 +28,10 @@ Key requirements when modifying:
 - Use "await Actor.pushData()" to save results
 - Handle errors gracefully with try/catch
 
-After modifying all files, the actor will be published automatically.
-Do NOT run apify push yourself - it will be done after you finish.
+After modifying all files, the actor will be tested and published automatically.
+Do NOT run apify push or apify run yourself - it will be done after you finish.
+
+IMPORTANT: Make sure the actor has sensible default values in the input schema so it can run without any input for testing purposes.
 
 Focus on creating clean, working code that follows Apify best practices.`;
 
@@ -169,7 +171,34 @@ Make sure the actor is complete and ready to deploy.`;
         console.log('installing dependencies...');
         execSync('bun install', { cwd: workDir, stdio: 'inherit' });
 
-        // publish the actor using bunx apify push
+        // build the actor
+        logs.push('building actor...');
+        console.log('building actor...');
+        execSync('bun run build', { cwd: workDir, stdio: 'inherit' });
+
+        // test the actor locally with apify run
+        logs.push('testing actor locally...');
+        console.log('testing actor locally...');
+        try {
+            const testResult = execSync('bun x apify-cli run --purge', {
+                cwd: workDir,
+                env: {
+                    ...process.env,
+                    APIFY_TOKEN: apifyToken,
+                },
+                encoding: 'utf-8',
+                timeout: 60000, // 60 second timeout for test
+            });
+            logs.push(`test passed: ${testResult.substring(0, 500)}`);
+            console.log('test passed:', testResult.substring(0, 500));
+        } catch (testError) {
+            const testErrorMsg = testError instanceof Error ? testError.message : String(testError);
+            logs.push(`test warning: ${testErrorMsg}`);
+            console.log('test warning (continuing anyway):', testErrorMsg);
+            // don't fail on test errors, just log them - the actor might need specific input
+        }
+
+        // publish the actor using apify push
         logs.push('publishing actor to apify...');
         console.log('publishing actor...');
         
