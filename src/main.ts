@@ -11,7 +11,7 @@ IMPORTANT: Read the GUIDE.md file in your working directory first! It contains t
 
 When building an actor, you must create these files in the working directory:
 1. src/main.ts - The main actor code using the Apify SDK
-2. .actor/actor.json - Actor metadata and configuration  
+2. .actor/actor.json - Actor metadata and configuration (IMPORTANT: version must be "MAJOR.MINOR" format like "1.0", NOT "1.0.0")
 3. .actor/input_schema.json - Input schema definition
 4. package.json - Dependencies (always include "apify": "^3.0.0")
 5. Dockerfile - Use the bun base image (FROM oven/bun:1)
@@ -81,6 +81,10 @@ Make sure the actor is complete and ready to deploy.`;
     console.log('starting claude agent...');
 
     try {
+        // find the claude code cli - check node_modules first, then fall back to global
+        const localCliPath = path.join(process.cwd(), 'node_modules', '@anthropic-ai', 'claude-agent-sdk', 'cli.js');
+        const cliPath = fs.existsSync(localCliPath) ? localCliPath : undefined;
+        
         const response = query({
             prompt: fullPrompt,
             options: {
@@ -88,6 +92,8 @@ Make sure the actor is complete and ready to deploy.`;
                 cwd: workDir,
                 systemPrompt: SYSTEM_PROMPT,
                 permissionMode: 'acceptEdits',
+                executable: 'bun',
+                pathToClaudeCodeExecutable: cliPath,
             }
         });
 

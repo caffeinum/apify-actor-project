@@ -71,12 +71,13 @@ Defines your actor's metadata:
   "name": "your-actor-name",
   "title": "Your Actor Title",
   "description": "What your actor does",
-  "version": "1.0.0",
+  "version": "1.0",
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",
   "input": "./input_schema.json"
 }
 ```
+**IMPORTANT:** Version must be in "MAJOR.MINOR" format (e.g., "1.0", "2.1"), NOT semver format like "1.0.0".
 
 #### 2. `.actor/input_schema.json`
 Defines the input fields for your actor:
