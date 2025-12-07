@@ -1,8 +1,8 @@
 {
   "actorSpecification": 1,
-  "name": "apify-actor-project",
-  "title": "Fun Text Transformer 🎨",
-  "description": "Transform your text in fun ways! Supports reverse, leetspeak, pirate talk, uwu, emojify, and more. Built with TypeScript and Bun, supports Standby mode for instant API responses.",
+  "name": "actor-builder",
+  "title": "Actor Builder 🤖",
+  "description": "AI-powered actor builder that uses Claude Agent SDK to create and publish Apify actors from natural language prompts.",
   "version": "1.0",
   "dockerfile": "./Dockerfile",
   "readme": "./README.md",

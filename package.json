@@ -1,8 +1,8 @@
 {
-  "name": "apify-actor-project",
+  "name": "actor-builder",
   "version": "1.0.0",
   "type": "module",
-  "description": "Apify Actor built with TypeScript and Bun",
+  "description": "AI-powered actor builder using Claude Agent SDK",
   "main": "dist/main.js",
   "scripts": {
     "start": "bun run dist/main.js",

@@ -1,34 +1,23 @@
 {
-  "title": "Fun Text Transformer Input",
+  "title": "Actor Builder Input",
   "type": "object",
   "schemaVersion": 1,
   "properties": {
-    "message": {
-      "title": "Message",
+    "prompt": {
+      "title": "Prompt",
       "type": "string",
-      "description": "The text you want to transform",
-      "editor": "textfield",
-      "default": "This is a cool and happy message!"
+      "description": "Describe the actor you want to build. Be specific about what it should do, what inputs it needs, and what outputs it should produce.",
+      "editor": "textarea",
+      "prefill": "Create a simple web scraper actor that takes a URL as input and extracts all links from the page"
     },
-    "transform": {
-      "title": "Transformation Type",
+    "actorName": {
+      "title": "Actor Name",
       "type": "string",
-      "description": "Choose how to transform your text",
-      "editor": "select",
-      "default": "emojify",
-      "enum": ["reverse", "uppercase", "lowercase", "leetspeak", "spongebob", "emojify", "pirate", "uwu", "ai"],
-      "enumTitles": [
-        "Reverse 🔄",
-        "UPPERCASE 📢",
-        "lowercase 🔽",
-        "L33T SP34K 💻",
-        "SpOnGeBoB 🧽",
-        "Emojify 😊",
-        "Pirate Talk ☠️",
-        "UwU Speak 🐱",
-        "AI 🤖"
-      ]
+      "description": "Name for the new actor (lowercase, no spaces, use hyphens)",
+      "editor": "textfield",
+      "prefill": "my-new-actor",
+      "pattern": "^[a-z0-9-]+$"
     }
   },
-  "required": ["message"]
+  "required": ["prompt", "actorName"]
 }
